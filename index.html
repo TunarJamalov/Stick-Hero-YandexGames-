@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Stick Hero</title>
+  <link rel="stylesheet" href="index.css" />
+  <script src="game.js" defer></script>
+  <!-- Yandex Games SDK -->
+  <script src="https://yandex.ru/games/sdk/v2"></script>
+  <style>
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      z-index: 9999;
+    }
+    #loading-screen.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    // Yandex SDK ve oyun başlatma işlemi
+    YaGames.init()
+      .then(ysdk => {
+        console.log('Yandex SDK başlatıldı');
+        window.ysdk = ysdk;
+  
+        // Oyun kaynaklarını yükle ve başlat
+        initializeGame(ysdk);
+      })
+      .catch(error => {
+        console.error('Yandex SDK başlatılamadı:', error);
+      });
+  
+    // Yükleme ekranını gizleme fonksiyonu
+    function hideLoadingScreen() {
+      const loadingScreen = document.getElementById('loading-screen');
+      if (loadingScreen) {
+        loadingScreen.classList.add('hidden');
+        console.log('Yükleme ekranı gizlendi');
+      }
+    }
+  
+    // Oyun başlatma fonksiyonu
+    function initializeGame(ysdk) {
+      console.log('Oyun kaynaklarını yüklemeye başlıyorum...');
+      loadGameResources()
+        .then(() => {
+          console.log('Oyun kaynakları yüklendi');
+          hideLoadingScreen(); // Yükleme ekranını gizle
+  
+          // Yandex Games SDK'ya oyun yüklendiğini bildir
+          if (ysdk.features && ysdk.features.LoadingAPI) {
+            console.log('LoadingAPI mevcut. Oyun hazır durumu bildiriliyor...');
+            
+            // Eğer ready() bir fonksiyon ise ve bir Promise döndürmüyorsa, doğrudan çağırıyoruz
+            if (typeof ysdk.features.LoadingAPI.ready === 'function') {
+              try {
+                ysdk.features.LoadingAPI.ready(); // Doğrudan çağırıyoruz, .then() kullanmadan
+                console.log('Oyun hazır!');
+              } catch (error) {
+                console.error('Oyun hazır durumu belirlenirken hata oluştu:', error);
+              }
+            } else {
+              console.error('ready() fonksiyonu mevcut değil veya geçersiz.');
+            }
+          } else {
+            console.error('LoadingAPI mevcut değil');
+          }
+        })
+        .catch(error => {
+          console.error('Oyun kaynakları yüklenirken hata oluştu:', error);
+        });
+    }
+  
+    // Oyun kaynaklarını yükleme işlemi (örnek simülasyon)
+    function loadGameResources() {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          // Kaynak yükleme hatası simülasyonu
+          const success = true; // Hata simüle etmek için bunu false yapabilirsiniz
+          if (success) {
+            console.log('Tüm kaynaklar yüklendi.');
+            resolve();
+          } else {
+            reject('Kaynaklar yüklenemedi');
+          }
+        }, 3000); // Yükleme süresi
+      });
+    }
+  </script>
+  
+
+  
+
+  <div class="container">
+    <div id="score"></div>
+    <canvas id="game" width="375" height="375"></canvas>
+    <div id="loading-screen">
+      <p>Loading...</p>
+    </div>
+    <div id="introduction"></div>
+    <div id="perfect">DOUBLE SCORE</div>
+    <button id="restart">RESTART</button>
+  </div>
+</body>
+</html>
